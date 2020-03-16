@@ -1,0 +1,19 @@
+Automatically aligned by extra spaces with the Sublime Text ElasticTabstops package
+×/path/
+Name                    	Video                         	Audio+Subs
+1AVC 1920×1080; deE-AC-3	 AVC 1920×1080  0.8m  8b      	EAC3 6ch 640k de
+2crf24,8b; 1a1s         	HEVC  704× 468  0.6m 10b crf24	 AAC 2ch  66k +sub, +comment AAC 2ch 66k
+3crf20,8b               	HEVC  720× 576  0.8m  8b crf20	 AC3 6ch 384k
+4es;noQ                 	HEVC 1920× 960  1.3m 10b      	 AAC 6ch 172k es +sub
+5abr                    	HEVC 1920× 816  1.3m 10b abr  	 AAC 2ch  68k
+6abr;2aud,1sub          	HEVC 1910× 796  2.3m 10b abr  	 AAC 6ch 192k +sub, +comment AAC 2ch 60k
+7crf24; 4aud,4sub,2comm 	HEVC  704× 468  0.6m 10b crf24	 AAC 2ch  66k +sub, +comment AAC 2ch 66k, + AAC 2ch 66k de, +comment AAC 2ch 66k de
+8StaticNoBR; noAud      	HEVC  720× 576        8b crf20
+9MPEG 17.7m             	MPEG  720× 576 17.7m  8b
+———NFO[AVC-HEVC-MPEG 468–1080p 0.6–17.7m 8-10b abr-crf20-24, AAC-AC3-EAC3 2-6ch 66–640k +s×4, +c×4 AAC 2ch ~63k, Source]
+
+×/path/subfolder/
+Name                    	Video                        	Audio+Subs
+1AVC 1920×1080; deE-AC-3	 AVC 1920×1080 0.8m  8b      	EAC3 6ch 640k de
+2crf24,8b; 1a1s         	HEVC  704× 468 0.6m 10b crf24	 AAC 2ch  66k +sub, +comment AAC 2ch 66k
+———NFO[AVC-HEVC 468-1080p 0.6-0.8m 8-10b crf24, AAC-EAC3 2-6ch 66-640k +s, +c AAC 2ch 66k, Source]

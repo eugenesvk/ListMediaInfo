@@ -1,0 +1,6 @@
+×/path/
+Name	Video	Audio+Subs
+1AVC 1920×1080; deE-AC-3	 AVC 1920×1080 0.8m  8b	EAC3 6ch 640k de
+2crf24,8b; 1a1s	HEVC  704× 468 0.6m 10b crf24	 AAC 2ch  66k +sub, +comment AAC 2ch 66k
+———NFO[AVC-HEVC 468-1080p 0.6-0.8m 8-10b crf24, AAC-EAC3 2-6ch 66-640k +s, +c AAC 2ch 66k, Source]
+
