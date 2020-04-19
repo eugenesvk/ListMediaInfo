@@ -229,7 +229,7 @@ def getNFOname(vFolder):
   return FileName
 
 def getMediaInfo(mediafile): #pymediainfo import MediaInfo as wrapMI
-  MIJSON = wrapMI.parse(mediafile, text=True, mediainfo_options={"Inform": "JSON"})
+  MIJSON = wrapMI.parse(mediafile, output="JSON")
   data = json.loads(MIJSON) #Decode JSON: Deserialize stdout to a Python object (object→dict)
   return data
 
@@ -498,7 +498,7 @@ group.add_argument("-e","--each"   	, action="store_true", help="create one NFO 
 parser.add_argument("-s","--silent"	, action="store_true", help="hide list of processed files")
 group.add_argument("out"           	, nargs='?',default="/", metavar="OutputName", help='Output file name [default="/": generate from files in the current folder]')
 groupI = parser.add_argument_group('optional info arguments')
-groupI.add_argument('-v','--version'	, action='version', version='%(prog)s 1.1@20-4')
+groupI.add_argument('-v','--version'	, action='version', version='%(prog)s 1.2@20-4')
 args = parser.parse_args()
 # group.add_argument("-o","--out"	, nargs='?',const="×Output", metavar="Name", help='Output file name [default: "×Output"; no flag: generated from files in the current folder]')
 if debug>3: print(args) #print command line ArgumentParser

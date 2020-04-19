@@ -6,3 +6,4 @@
 - v0.6 feature: use pymediainfo wrapper to access MediaInfo libray instead of the command-line utility
 - v1.0 no changes
 - v1.1 removed non-configurable global vars from config and minor edits
+- v1.2 updated API of PyMediaInfo library to get JSON via the new Output option (https://github.com/sbraz/pymediainfo/issues/82)
