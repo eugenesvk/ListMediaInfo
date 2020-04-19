@@ -331,8 +331,8 @@ def storeFileInfo(vFolder,file,level,fi): #Store info for a video file in a glob
   fvbase = os.path.basename(vFile)
   fvname = os.path.splitext(fvbase)[0]
   if debug>3: print ('=Debug: storeFileInfo(' + vFolder +', ' + ', ' + file + ')')
-  levelIndent = ' '*2*level
-  if not args.silent: print(levelIndent+' '+vFile) # list
+  spacer = indentlevel*level
+  if not args.silent: print(spacer+' '+vFile) # list
 
   # Get MediaInfo as a JSON object (=Python dictionary) and extract media tracks
   MI      	= getMediaInfo(vFile)
