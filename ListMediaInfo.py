@@ -14,8 +14,15 @@ from natsort import natsorted, humansorted, ns
 import locale
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
+# Set global variables
+NFOname0    = ''            # (empty) NFO file name for the top folder
+vSource     = '.'           # (redundant?) Default path — current folder
+vDict       = {}            # Dictionary to store selected file info to generate file_name.nfo
+vfDict      = {}            # Dictionary to store all file info like this {'fIndex': {'fCat1':fCat1,...}}
+writeBuffer = []            # a list buffer to write data to instead of directly to file
+level       = 0             # folder level
 # Import global variables from an external config
-from lmiconfig import debug,level,fPrefix,NFOname0,NFOPre,NFOSrc,NFOSuf,vSource,H1,H2,H3,vDict,vfDict,writeBuffer,jRange,jGen,indentlevel,vDimLimit,aTMax,vFpadMin,vWpadMin,vHpadMin,vBRpadMin,vBDpadMin,aFpadMin,aBRpadMin,padFill,extensions
+from lmiconfig import debug,fPrefix,NFOPre,NFOSrc,NFOSuf,H1,H2,H3,jRange,jGen,indentlevel,vDimLimit,aTMax,vFpadMin,vWpadMin,vHpadMin,vBRpadMin,vBDpadMin,aFpadMin,aBRpadMin,padFill,extensions
 
 def files(path):
   for item in os.listdir(path):
