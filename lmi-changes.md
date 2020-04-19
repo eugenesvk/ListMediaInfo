@@ -5,3 +5,4 @@
 - v0.5 feature: reworked command-line arguments via argparse; added options for less verbose output and to create a separte NFO file for each sub-folder
 - v0.6 feature: use pymediainfo wrapper to access MediaInfo libray instead of the command-line utility
 - v1.0 no changes
+- v1.1 removed non-configurable global vars from config and minor edits
