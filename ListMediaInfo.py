@@ -190,7 +190,9 @@ def getNFOname(vFolder):
     return FileName                                	#return if no extra commentary tracks
   if aComCount>1: aComCountI = '×' + str(aComCount)	#add No of commentary tracks if >1
   else: aComCountI = ''
-  aF1	= jGen.join(map(str,(unique(aF1))))
+  aF1unique = unique(aF1)
+  aF1unique.sort() #sort list in place
+  aF1    = jGen.join(map(str,aF1unique))
   if debug>2: print('Debug getNFOname: Unique aF1\t: ' + str(aF1))
   FileName = FileName + ', +c'+aComCountI+' '+str(aF1)
   if debug>2: print('Debug getNFOname +aF1: ' + str(FileName))
@@ -207,8 +209,8 @@ def getNFOname(vFolder):
     FileName += ' '+aCh1min+jRange+aCh1max+'ch'
   if debug>2: print('Debug getNFOname +aCh1: ' + str(FileName))
 
-  aBR1     	= list(map(int,(unique(aBR1)))) #unique bitrate#, converted to int for sorting
   aBR1List 	= list(map(int,aBR1)) #non-unique bitrate#, converted to int for averaging
+  aBR1     	= list(map(int,(unique(aBR1)))) #unique bitrate#, converted to int for sorting
   # aBR1avg	= int(sum(aBR1)/float(len(aBR1)))
   aBR1avg  	= int(sum(aBR1List)/float(len(aBR1List))) 	#average based on full list
   aBR1avg  	= '{:.0fhcss^1}'.format(FileSize(aBR1avg))	#123456 → 123k
