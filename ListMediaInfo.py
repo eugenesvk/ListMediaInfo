@@ -482,41 +482,45 @@ def writeBufferToFile(target): # write writeBuffer to file and reset it
 
   writeBuffer=[]
 
-# Main
-parser = argparse.ArgumentParser(description="Create a list of video files with key Vid/Aud info formatted like this\n(tab-separted columns, space-padded values for vertical alignment):\n"+"  "+H1+"\t"+H2+"                       \t"+H3+"""
-  N1\t AVC 1920×1080 0.8m  8b      \tEAC3 6ch 640k de
-  N2\tHEVC  704× 468 0.6m 10b crf24\t AAC 2ch  66k +sub, +comment AAC 2ch 66k
+def main():
+  parser = argparse.ArgumentParser(description="Create a list of video files with key Vid/Aud info formatted like this\n(tab-separted columns, space-padded values for vertical alignment):\n"+"  "+H1+"\t"+H2+"                       \t"+H3+"""
+    N1\t AVC 1920×1080 0.8m  8b      \tEAC3 6ch 640k de
+    N2\tHEVC  704× 468 0.6m 10b crf24\t AAC 2ch  66k +sub, +comment AAC 2ch 66k
 
-where
-  Vid\tFormat Width×Height Bitrate Bitdepth RateControl Type/Quality
-  Aud\t[Track#1] Format #ofChannels Bitrate Language≠en +Subtitle, [Track#2+] +Title ...
+  where
+    Vid\tFormat Width×Height Bitrate Bitdepth RateControl Type/Quality
+    Aud\t[Track#1] Format #ofChannels Bitrate Language≠en +Subtitle, [Track#2+] +Title ...
 
-...and a summary NFO file name with the list/count/average/range of values:\n  """+NFOPre+"AVC-HEVC 468-1080p 0.6-0.8m 8-10b crf24, AAC-EAC3 2-6ch 66-640k +s, +c AAC 2ch 66k"+NFOSrc+NFOSuf, formatter_class=RawDHF)
-group = parser.add_mutually_exclusive_group()
-parser.add_argument("input"        	, metavar="InputPath", help="Add /Path/To/Input/Video (or '.' for current folder)")
-group.add_argument("-e","--each"   	, action="store_true", help="create one NFO file for each (sub)folder instead of one for all (sub)folders")
-parser.add_argument("-s","--silent"	, action="store_true", help="hide list of processed files")
-group.add_argument("out"           	, nargs='?',default="/", metavar="OutputName", help='Output file name [default="/": generate from files in the current folder]')
-groupI = parser.add_argument_group('optional info arguments')
-groupI.add_argument('-v','--version'	, action='version', version='%(prog)s 1.2@20-4')
-args = parser.parse_args()
-# group.add_argument("-o","--out"	, nargs='?',const="×Output", metavar="Name", help='Output file name [default: "×Output"; no flag: generated from files in the current folder]')
-if debug>3: print(args) #print command line ArgumentParser
+  ...and a summary NFO file name with the list/count/average/range of values:\n  """+NFOPre+"AVC-HEVC 468-1080p 0.6-0.8m 8-10b crf24, AAC-EAC3 2-6ch 66-640k +s, +c AAC 2ch 66k"+NFOSrc+NFOSuf, formatter_class=RawDHF)
+  group = parser.add_mutually_exclusive_group()
+  parser.add_argument("input"         , metavar="InputPath", help="Add /Path/To/Input/Video (or '.' for current folder)")
+  group.add_argument("-e","--each"    , action="store_true", help="create one NFO file for each (sub)folder instead of one for all (sub)folders")
+  parser.add_argument("-s","--silent" , action="store_true", help="hide list of processed files")
+  group.add_argument("out"            , nargs='?',default="/", metavar="OutputName", help='Output file name [default="/": generate from files in the current folder]')
+  groupI = parser.add_argument_group('optional info arguments')
+  groupI.add_argument('-v','--version'  , action='version', version='%(prog)s 1.2@20-4')
+  global args
+  args = parser.parse_args()
+  # group.add_argument("-o","--out" , nargs='?',const="×Output", metavar="Name", help='Output file name [default: "×Output"; no flag: generated from files in the current folder]')
+  if debug>3: print(args) #print command line ArgumentParser
 
-vSource = os.path.normpath(args.input)
-if vSource[-1] != '/': vSource += '/'
-if debug>1: print ('==>vSource : ', vSource)
+  vSource = os.path.normpath(args.input)
+  if vSource[-1] != '/': vSource += '/'
+  if debug>1: print ('==>vSource : ', vSource)
 
-#Create a global dictionary with all a/v info for all a/v files recursively
-LoopFiles(vSource,level,args.each) # if -e also writes to file in each folder
+  #Create a global dictionary with all a/v info for all a/v files recursively
+  LoopFiles(vSource,level,args.each) # if -e also writes to file in each folder
 
-if args.out!='/': # use OutputName when it's given ('/' is the value when empty)
-  target = os.path.normpath(vSource+args.out) # (Win) converts / to \
-  targetInfo = ' (user input)'
-else: # Default to auto-generated NFO file name based on the initial folder (unless -e)
-  target = os.path.normpath(vSource+NFOPre + NFOname0 + NFOSuf)
-  targetInfo = ' (auto-generated)'
+  if args.out!='/': # use OutputName when it's given ('/' is the value when empty)
+    target = os.path.normpath(vSource+args.out) # (Win) converts / to \
+    targetInfo = ' (user input)'
+  else: # Default to auto-generated NFO file name based on the initial folder (unless -e)
+    target = os.path.normpath(vSource+NFOPre + NFOname0 + NFOSuf)
+    targetInfo = ' (auto-generated)'
 
-if debug>0: print('\n"ListMediaInfo.py ' + vSource + ' ' + target+'"'+targetInfo)
+  if debug>0: print('\n"ListMediaInfo.py ' + vSource + ' ' + target+'"'+targetInfo)
 
-if not args.each: writeBufferToFile(target) # if not -e write to one file for all folders
+  if not args.each: writeBufferToFile(target) # if not -e write to one file for all folders
+
+if __name__ == '__main__':
+  main()
