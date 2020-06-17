@@ -326,6 +326,27 @@ def formataStreamInfo(file, i, aStream, tSub): #parse Audio Stream info
   # log(4,'data \t= {' + data +'}')
   return data #[, +Title] Codec Channels BitRate +Subtiles (e.g. 'AAC 6ch 192k +sub' or ', +comment AAC 2ch 60k'
 
+def formattStreamInfo(file, i, tStream): #parse Text Stream info
+  global vDict, vDictCol
+  tt = tStream
+  log(1,tt)
+  try   	: tF = tt['Format']
+  except	: tF = ''
+  try   	: tLang = tt['Language']
+  except	: tLang = ''
+  vDict['tF'].append(tF)
+  vDict['tLang'].append(tLang)
+
+  preL = ' 'if tLang>'' else ''
+  tLangI = tLang # add language indicator unless 'en'
+
+  data = preL+tLang
+  # fill data for Columns
+  tDataCol  = {'tF':tF, 'preL':preL,'tLang':tLang}
+  vDictCol[file]['Sub'].update({i:tDataCol})
+  log(4,'formattStreamInfo: ' + data)
+  return data # Subtitle Language (e.g. 'en de es')
+
 def storeFileInfo(vFolder,file,level,fi): #Store info for a video file in a global dictionary
   # Initialize
   global vfDict
@@ -351,8 +372,8 @@ def storeFileInfo(vFolder,file,level,fi): #Store info for a video file in a glob
     elif (track['@type'] == 'Text'):
       tStreams.append(track)
 
-  if len(tStreams)>0:
-    tSub = ' +sub' # Test if subtitles exist
+  if len(tStreams)>0: # Test if subtitles exist
+    tSub = '+sub'
     vDict['tSub'].append(tSub)
   else:	tSub = ''
 
@@ -362,10 +383,11 @@ def storeFileInfo(vFolder,file,level,fi): #Store info for a video file in a glob
 def writeFileInfo(fi): #Read video file info from a global dictionary and write it to NFO
   global vfDict,writeBuffer
   fvname   = vfDict[fi]['fvname']
+  fvext    = vfDict[fi]['fvext']
   vStreams = vfDict[fi]['vStreams']
   aStreams = vfDict[fi]['aStreams']
   tStreams = vfDict[fi]['tStreams']
-  tSub = vfDict[fi]['tSub']
+  tSub     = vfDict[fi]['tSub']
   file     = fvname + fvext
 
   # Parse each Vid/Aud/Sub stream and write selected stream output to file
@@ -380,6 +402,9 @@ def writeFileInfo(fi): #Read video file info from a global dictionary and write 
   for i in range(len(aStreams)): # Audio streams: create list data for each
     aInfo = formataStreamInfo(file,i,aStreams[i],tSub)
     writeBuffer.append(aInfo) #3. Audio info
+
+  for i in range(len(tStreams)): # Text streams: create list data for each
+    tInfo = formattStreamInfo(file,i,tStreams[i])
 
   writeBuffer.append('\n') #4. New line
 
