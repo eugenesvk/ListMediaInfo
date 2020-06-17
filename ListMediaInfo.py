@@ -6,6 +6,7 @@ from os.path import isfile, join
 import subprocess
 import json
 import re
+from collections import defaultdict as ddict # allows autocreation of empty keys
 import argparse
 from argparse import RawDescriptionHelpFormatter as RawDHF, RawTextHelpFormatter
 from pymediainfo import MediaInfo as wrapMI
@@ -16,15 +17,23 @@ from logging import log as log
 import locale
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
-# Set global variables
-NFOname0    = ''            # (empty) NFO file name for the top folder
-vSource     = '.'           # (redundant?) Default path — current folder
-vDict       = {}            # Dictionary to store selected file info to generate file_name.nfo
-vfDict      = {}            # Dictionary to store all file info like this {'fIndex': {'fCat1':fCat1,...}}
-writeBuffer = []            # a list buffer to write data to instead of directly to file
-level       = 0             # folder level
-# Import global variables from an external config
-from lmiconfig import debug,fPrefix,NFOPre,NFOSrc,NFOSuf,H1,H2,H3,jRange,jGen,indentlevel,vDimLimit,aTMax,vFpadMin,vWpadMin,vHpadMin,vBRpadMin,vBDpadMin,aFpadMin,aBRpadMin,padFill,extensions
+from lmiconfig import * # import global vars from an external config
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logMin)
+
+recDD = lambda: ddict(recDD) # recursive dicts, allows x['a']['b']['c']['d'] w/o KeyError
+
+def setGlobals(): # Set global variables
+  global NFOname0,vSource,vDict,vfDict,vDictCol,writeBuffer,level,padF,args, pPrefix
+  NFOname0   	= ''          	# (empty) NFO file name for the top folder
+  vSource    	= '.'         	# (redundant?) Default path — current folder
+  vDict      	= ddict(list) 	# Stores selected file info to generate folder.nfo
+  vfDict     	= {}          	# Stores all file info ~{'fIndex': {'fCat1':fCat1,...}}
+  vDictCol   	= recDD()     	# Stores formatted file info for A/V columns
+  writeBuffer	= []          	# Buffer to write .nfo data to instead of directly to file
+  level      	= 0           	# Folder level
+  padF       	= padFmt[Font]	# width diff 'HE' vs 'A' @Font: .replace(' AVC',padF['AVC'])
+  args       	= argparse.ArgumentParser() # Empty argparse object
+  pPrefix    	= pPrefix if pPrefix>'' else os.sep # Path separator
 
 def files(path):
   for item in os.listdir(path):
@@ -44,12 +53,8 @@ def unique(ilist): # function to get unique values
   unique_list	= (list(list_set))	# convert the set to the list
   return unique_list
 def resetVarList(): #reset global varibles for each new folder
-  global vfDict,vDict
-  vfDict = {}
-  vDict	= {'vF':[],'vW':[],'vH':[],'vWxH':[],'vBR':[],'vBD':[],'vrcType':[],'vrcValue':[],
-           'aF':[], 'aCh':[], 'aBR':[], 'aLang':[],
-           'aF1':[],'aCh1':[],'aBR1':[],'aLang1':[],'aT1':[],
-           'tSub':[]} # vDict['key'].append('1')
+  global vfDict,vDict,vDictCol
+  vfDict, vDictCol, vDict	= ({}, recDD(), ddict(list))
   global vFpad,vWpad,vHpad,vBRpad,vBDpad,aFpad,aBRpad
   vFpad,vWpad,vHpad,vBRpad,vBDpad,aFpad,aBRpad = (vFpadMin,vWpadMin,vHpadMin,vBRpadMin,vBDpadMin,aFpadMin,aBRpadMin)
 
@@ -63,7 +68,9 @@ def getNFOname(vFolder):
   vFunique = unique(vDict['vF'])
   vFunique.sort() #sort list in place
   vF	= jGen.join(map(str,vFunique))
-  FileName = str(vF)
+  FileName       	= ddict(str) # empty dictionary to collect NFO file name
+  FileName['vF'] 	= str(vF)
+  FileName['Out']	= FileName['vF'] # store intermediate results here (cumulatively)
   log(3,'FileName+vF: ' + FileName['Out'])
 
   vW    	= list(map(int,(unique(vDict['vW']))))	#Unique list of Widths, →int for sorting
