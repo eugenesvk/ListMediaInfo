@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Set global variables
-debug      	= 0           	# 5 levels of verbosity
+logMin     	= 6           	# min logging threshold (1–5, 6+ hides all)
 H1         	= 'Name'      	# Header for Column 1
 H2         	= 'Video'     	# Header for Column 2
 H3         	= 'Audio&Subs'	# Header for Column 3

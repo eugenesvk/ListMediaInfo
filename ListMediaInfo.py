@@ -11,6 +11,8 @@ from argparse import RawDescriptionHelpFormatter as RawDHF, RawTextHelpFormatter
 from pymediainfo import MediaInfo as wrapMI
 from hfilesize import Format, FileSize
 from natsort import natsorted, humansorted, ns
+import logging
+from logging import log as log
 import locale
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
@@ -53,7 +55,7 @@ def resetVarList(): #reset global varibles for each new folder
 
 def getNFOname(vFolder):
   global vDict
-  if debug>2: print("Debug getNFOname: vDict before reset:" + str(vDict))
+  log(3,"NFO: vDict before reset:" + str(vDict))
 
   #Video:  FileName.nfo vF vW×vH vBR vBD'b'+vRC (all values are ranges for all listed files)
   # vF,vW,vH,vBD,vBR,vrcType,vrcValue,FileName = ('','','','','','','','')
@@ -61,24 +63,22 @@ def getNFOname(vFolder):
   vFunique = unique(vDict['vF'])
   vFunique.sort() #sort list in place
   vF	= jGen.join(map(str,vFunique))
-  if debug>2: print('Debug getNFOname: Unique vF\t: ' + str(vF))
   FileName = str(vF)
-  if debug>2: print('Debug getNFOname, FileName+vF: ' + str(FileName))
+  log(3,'FileName+vF: ' + FileName['Out'])
 
   vW    	= list(map(int,(unique(vDict['vW']))))	#Unique list of Widths, →int for sorting
   vH    	= list(map(int,(unique(vDict['vH']))))	#Unique list of Heights, →int for sorting
   vHFull	= list(map(int,vDict['vH']))          	#Full list of Heights, →int for sorting
   vWxH  	= [str(a)+'×'+str(b) for a,b in zip(vW,vH)] #string
   vHmin 	= min(vH); vHmax = max(vH); vHavg = int(sum(vHFull)/float(len(vHFull)))
-  if debug>2:
-    print("vDict['vW/vH']→unique values→integers")
-    print('\tvW:'+str(vDict['vW']) +'\t→ '+str(unique(vDict['vW']))+'\t→ '+str(vW))
-    print('\tvH:'+str(vDict['vH']) +'\t→ '+str(unique(vDict['vH']))+'\t→ '+str(vH))
-    print('vWxH text: '+str(vWxH)+', lenght: '+str(len(vWxH))+', vWxH[0]: '+str(vWxH[0]))
-    print('vHmin: '+str(vHmin)+', vHmax: '+str(vHmax))
   if (len(vWxH)==1):
     FileName += ' '+vWxH[0]
   elif (len(vWxH)>1):
+  log(3, "vDict['vW/vH']→unique values→integers")
+  log(3, '\tvW:'+str(vDict['vW']) +'\t→ '+str(unique(vDict['vW']))+'\t→ '+str(vW))
+  log(3, '\tvH:'+str(vDict['vH']) +'\t→ '+str(unique(vDict['vH']))+'\t→ '+str(vH))
+  log(3, 'vWxH text: '+str(vWxH)+', lenght: '+str(len(vWxH))+', vWxH[0]: '+str(vWxH[0]))
+  log(3, 'vHmin: '+str(vHmin)+', vHmax: '+str(vHmax))
     if (int(vHmax)/int(vHmin)>vDimLimit):
       if (len(vHFull)==2):
         FileName += ' '+str(vHmin)+jGen+str(vHmax)+'p'
@@ -87,6 +87,7 @@ def getNFOname(vFolder):
     else:
       FileName += ' ~'+str(vHavg)+'p'
   if debug>2: print('Debug getNFOname, FileName+vWxH: ' + str(FileName))
+  log(3,'FileName+vDim: ' + FileName['Out'])
 
   vBR    	= list(map(int,(unique(vDict['vBR'])))) #Unique list of BitRates, →int for sorting
   vBRFull	= list(map(int,vDict['vBR']))           #Full list of BitRates
@@ -99,10 +100,9 @@ def getNFOname(vFolder):
       FileName += ' '+vBRmin.replace('m','')+jGen+vBRmax
     elif (len(vBRFull)>2):
       FileName += ' '+vBRmin.replace('m','')+jRange+vBRmax
-  if debug>2:
-    print("vDict['vBR']→unique values→integers")
-    print('\tvBR:'+str(vDict['vBR']) +'\t→ '+str(unique(vDict['vBR']))+'\t→ '+str(vBR))
-    print('Debug getNFOname, FileName+BitRate: ' + str(FileName))
+  log(3, "vDict['vBR']→unique values→integers")
+  log(3, '\tvBR:'+str(vDict['vBR']) +'\t→ '+str(unique(vDict['vBR']))+'\t→ '+str(vBR))
+  log(3, 'FileName+vBR: ' + FileName['Out'])
 
   vBD     	= vDict['vBD']
   vrcType 	= vDict['vrcType']
@@ -119,11 +119,10 @@ def getNFOname(vFolder):
   vBDSep = ''
   if len(vrcType+vrcValue)>0: vBDSep=' '
   FileName += ' '+vBD+'b'+vBDSep+vrcType+vrcValue
-  if debug>2:
-    print('Uniqe, sorted & -joined:')
-    print('...vBD     \t: ' + vBD)
-    print('...vrcType \t: ' + vrcType)
-    print('...vrcValue\t: ' + vrcValue)
+  log(3, 'Uniqe, sorted & -joined:')
+  log(3, '...vBD     \t: ' + vBD)
+  log(3, '...vrcType \t: ' + vrcType)
+  log(3, '...vrcValue\t: ' + vrcValue)
 
   #Audio: aStart aF aCh'ch' aBR (values are ranges for all listed files)
   aF,aCh,aBR,aLang = (vDict['aF'],vDict['aCh'],vDict['aBR'],vDict['aLang'])
@@ -138,9 +137,9 @@ def getNFOname(vFolder):
   aFunique = unique(aF)
   aFunique.sort() #sort list in place
   aF	= jGen.join(map(str,aFunique))
-  if debug>2: print('Debug getNFOname: Unique aF\t: ' + str(aF))
   FileName = FileName + ', '+str(aF)
-  if debug>2: print('Debug getNFOname +aF: ' + str(FileName))
+  log(3,'getNFOname: Unique aF\t: ' + str(aF))
+  log(3,'FileName[aF]: ' + FileName['aF'])
 
   aCh	= list(map(int,(unique(aCh)))) #converted to int for sorting
   if aCh!=[]:
@@ -164,10 +163,9 @@ def getNFOname(vFolder):
     elif (len(aBR)>2):
       FileName += ' '+aBRmin.replace('k','')+jRange+aBRmax
   FileName += aLangI+tSubI
-  if debug>2:
-    print("vDict['aBR']→unique values→integers")
-    print('\taBR:'+str(vDict['aBR']) +'\t→ '+str(unique(vDict['aBR']))+'\t→ '+str(aBR))
-    print('Debug getNFOname, FileName+BitRate: ' + str(FileName))
+  log(3, "vDict['aBR']→unique values→integers")
+  log(3, '\taBR:'+str(vDict['aBR']) +'\t→ '+str(unique(vDict['aBR']))+'\t→ '+str(aBR))
+  log(3, 'FileName+aF+aCh+aBR: ' + FileName['Out'])
 
   # Extra Commentary audTracks: list of unique/avg(str→int) values with a jGen(dash) separator
   aF1,aCh1,aBR1,aLang1,aT1 = (vDict['aF1'],vDict['aCh1'],vDict['aBR1'],vDict['aLang1'],vDict['aT1'])
@@ -193,9 +191,9 @@ def getNFOname(vFolder):
   aF1unique = unique(aF1)
   aF1unique.sort() #sort list in place
   aF1    = jGen.join(map(str,aF1unique))
-  if debug>2: print('Debug getNFOname: Unique aF1\t: ' + str(aF1))
   FileName = FileName + ', +c'+aComCountI+' '+str(aF1)
-  if debug>2: print('Debug getNFOname +aF1: ' + str(FileName))
+  log(3,'getNFOname: Unique aF1\t: ' + str(aF1))
+  log(3,'getNFOname +aF1: ' + FileName['Out'])
 
   aCh1   	= list(map(int,(unique(aCh1)))) #unique channel#, converted to int for sorting
   aCh1min	= str(min(aCh1))
@@ -207,7 +205,7 @@ def getNFOname(vFolder):
     FileName += ' '+aCh1min+jGen+aCh1max+'ch'
   elif (aCh1len>2):
     FileName += ' '+aCh1min+jRange+aCh1max+'ch'
-  if debug>2: print('Debug getNFOname +aCh1: ' + str(FileName))
+  log(3,'getNFOname +aCh1: ' + FileName['Out'])
 
   aBR1List 	= list(map(int,aBR1)) #non-unique bitrate#, converted to int for averaging
   aBR1     	= list(map(int,(unique(aBR1)))) #unique bitrate#, converted to int for sorting
@@ -220,11 +218,10 @@ def getNFOname(vFolder):
   elif (aBR1len>1):
     FileName += ' ~'+aBR1avg
   FileName += NFOSrc
-  if debug>2:
-    print("vDict['aBR1']→unique values→integers")
-    print('\taBR1:'+str(vDict['aBR1']) +'\t→ '+str(unique(vDict['aBR1']))+'\t→ '+str(aBR1))
-    print('Debug getNFOname, FileName+BitRate: ' + str(FileName))
   if debug>1: print('Debug getNFOname with Audio2: ' + str(FileName))
+  log(3, "vDict['aBR1']→unique values→integers")
+  log(3, '\taBR1:'+str(vDict['aBR1']) +'\t→ '+str(unique(vDict['aBR1']))+'\t→ '+str(aBR1))
+  log(3, 'FileName+BitRate: ' + FileName['Out'])
 
   return FileName
 
@@ -284,7 +281,7 @@ def formatvStreamInfo(i, vStream):
 def formataStreamInfo(i, aStream, tSub): #parse Audio Stream info
   global vDict
   at = aStream
-  if debug>4: print(at)
+  log(1,at)
   Fpad,BRpad = (aFpad,aBRpad)
   aF,aCh,aBR,aLang,aT = (at['Format'],at['Channels'],'','','')
   try:
@@ -315,14 +312,13 @@ def formataStreamInfo(i, aStream, tSub): #parse Audio Stream info
   aF = '{msg:{fill}{align}{width}}'.format(msg=aF,fill=padFill,align='>',width=Fpad)
   aBR ='{:.0fhcss^1}'.format(FileSize(aBR)) #123456 → 123k
   aBR = '{msg:{fill}{align}{width}}'.format(msg=aBR,fill=padFill,align='>',width=BRpad)
-  # if debug>1: print('aBitrate \t= {' + aBR +'}')
   aStart,aEnd,aLangI = ('','','')
   if i>0  : aStart = ', +' + aT[:aTMax].lower()+' '	# Limit Title length→lower case
   if i==0 : aEnd = tSub                            	# mark 1st aud stream as having a subtitle
   if aLang!='en': aLangI = ' ' +aLang              	# add language indicator unless 'en'
 
   data = aStart+aF+' '+aCh+'ch'+' '+str(aBR)+aLangI+aEnd
-  # if debug>1: print('data \t= {' + data +'}')
+  # log(4,'data \t= {' + data +'}')
   return data #[, +Title] Codec Channels BitRate +Subtiles (e.g. 'AAC 6ch 192k +sub' or ', +comment AAC 2ch 60k'
 
 def storeFileInfo(vFolder,file,level,fi): #Store info for a video file in a global dictionary
@@ -332,7 +328,7 @@ def storeFileInfo(vFolder,file,level,fi): #Store info for a video file in a glob
   vFile = vFolder + file
   fvbase = os.path.basename(vFile)
   fvname = os.path.splitext(fvbase)[0]
-  if debug>3: print ('=Debug: storeFileInfo(' + vFolder +', ' + ', ' + file + ')')
+  log(2,'storeFileInfo(' + vFolder +', ' + ', ' + file + ')')
   spacer = indentlevel*level
   if not args.silent: print(spacer+' '+vFile) # list
 
@@ -379,9 +375,9 @@ def writeFileInfo(fi): #Read video file info from a global dictionary and write 
 
   writeBuffer.append('\n') #4. New line
 
-  if debug>4: print('vStreams∑=' + str(len(vStreams)) + ':' + str(vStreams) + '\n')
-  if debug>4: print('aStreams∑=' + str(len(aStreams)) + ':' + str(aStreams) + '\n')
-  if debug>4: print('tStreams∑=' + str(len(tStreams)) + ':' + str(tStreams) + '\n')
+  log(1,'vStreams∑=' + str(len(vStreams)) + ':' + str(vStreams) + '\n')
+  log(1,'aStreams∑=' + str(len(aStreams)) + ':' + str(aStreams) + '\n')
+  log(1,'tStreams∑=' + str(len(tStreams)) + ':' + str(tStreams) + '\n')
 
 def setPadValues(filesNo): #set padding values to match the max value in range
   global vFpad,vWpad,vHpad,vBDpad,vBRpad,aFpad,aBRpad,vfDict
@@ -390,7 +386,7 @@ def setPadValues(filesNo): #set padding values to match the max value in range
     vStreams = vfDict[fi]['vStreams']
     aStreams = vfDict[fi]['aStreams']
     for j in range(len(vStreams)): # for each stream, get max length of var to pad to
-      if debug>4: print('fvname,fi,j'+"|"+vfDict[fi]['fvname']+"|"+str(fi)+"|"+str(j))
+      log(1,'fvname,fi,j'+"|"+vfDict[fi]['fvname']+"|"+str(fi)+"|"+str(j))
       try:
         vt	= vStreams[j]
         vF,vW,vH,vBD = (vt['Format'],vt['Width'],vt['Height'],vt['BitDepth'])
@@ -414,13 +410,13 @@ def setPadValues(filesNo): #set padding values to match the max value in range
         aBRpad	= max(aBRpad, len(aBR))
       except:
         pass
-  if debug>2: print('vFpad(3)='+str(vFpad) + '|vWpad(3)='+str(vWpad) + '|vHpad(3)='+str(vHpad) + '|vBDpad(1)='+str(vBDpad) + '|vBRpad(3)='+str(vBRpad) + '|aFpad(3)='+str(aFpad) + '|aBRpad(3)='+str(aBRpad))
+  log(3,'vFpad(3)='+str(vFpad) + '|vWpad(3)='+str(vWpad) + '|vHpad(3)='+str(vHpad) + '|vBDpad(1)='+str(vBDpad) + '|vBRpad(3)='+str(vBRpad) + '|aFpad(3)='+str(aFpad) + '|aBRpad(3)='+str(aBRpad))
 
 def LoopFiles(vFolder='.',level=1,each=False): # call FileInfo for videos and self on subfolders
   global writeBuffer,NFOname0
   level += 1
   spacer = indentlevel*level
-  if debug>0: print(spacer + '[' + vFolder)
+  log(5,spacer + '[' + vFolder)
 
   if os.path.isdir(vFolder):
     if vFolder[-1] != "/": vFolder += "/"
@@ -433,16 +429,17 @@ def LoopFiles(vFolder='.',level=1,each=False): # call FileInfo for videos and se
         storeFileInfo(vFolder, file, level, filesNo) #Store file info in a global dictionary
         filesNo += 1
       elif not(ext.upper() == '.JPG' or ext.upper() == '.TXT'):
-        if debug>0: print (spacer + '×' + vFolder + file)
+        log(5,spacer + '→' + vFolder + file)
 
     if filesNo==0:
-      if debug>0: print('No video files in this folder: ' + vFolder)
+      log(5,'No video files in this folder: ' + vFolder)
     else:
       Header = H1+'\t'+H2+'\t'+H3+'\n'
       writeBuffer.append(fPrefix + vFolder + '\n' + Header) #Folder header info
       setPadValues(filesNo)
       for i in range(filesNo): writeFileInfo(i)
       NFOname = getNFOname(vFolder)
+      log(2, nfo['vF'] +' '+ nfo['vDim'] +' '+ nfo['vBR'] +' '+ nfo['vBD']+' '+ nfo['vRC'] +', '+ nfo['aF'] +' '+ nfo['aCh'] +' '+ nfo['aBR'] +' '+ nfo['Lang']+' '+ nfo['Sub'] + nfo['aF1'] +' '+ nfo['aCh1'] +' '+ nfo['aBR1'])
       if level==1: NFOname0 = NFOname
       writeBuffer.append('———NFO[' + NFOname + ']\n\n')
       if each:
@@ -475,9 +472,9 @@ def writeBufferToFile(target): # write writeBuffer to file and reset it
   fOut.close
 
   print('\n✓\n' + target)
-  if debug>0:
+  if logMin<6:
     fOut = open(target,'r')
-    print(fOut.read())
+    if fOut.mode == 'r': log(5,fOut.read())
     fOut.close
 
   writeBuffer=[]
@@ -502,11 +499,11 @@ def main():
   global args
   args = parser.parse_args()
   # group.add_argument("-o","--out" , nargs='?',const="×Output", metavar="Name", help='Output file name [default: "×Output"; no flag: generated from files in the current folder]')
-  if debug>3: print(args) #print command line ArgumentParser
+  log(2,args) #print command line ArgumentParser
 
   vSource = os.path.normpath(args.input)
   if vSource[-1] != '/': vSource += '/'
-  if debug>1: print ('==>vSource : ', vSource)
+  log(4, '▶vSource : ' + vSource)
 
   #Create a global dictionary with all a/v info for all a/v files recursively
   LoopFiles(vSource,level,args.each) # if -e also writes to file in each folder
@@ -518,7 +515,7 @@ def main():
     target = os.path.normpath(vSource+NFOPre + NFOname0 + NFOSuf)
     targetInfo = ' (auto-generated)'
 
-  if debug>0: print('\n"ListMediaInfo.py ' + vSource + ' ' + target+'"'+targetInfo)
+  log(5,'\n"ListMediaInfo.py ' + vSource + ' ' + target+'"'+targetInfo)
 
   if not args.each: writeBufferToFile(target) # if not -e write to one file for all folders
 
