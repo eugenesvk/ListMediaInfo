@@ -420,8 +420,10 @@ def setPadValues(filesNo): #set padding values to match the max value in range
         pass
   log(3,'vFpad(3)='+str(vFpad) + '|vWpad(3)='+str(vWpad) + '|vHpad(3)='+str(vHpad) + '|vBDpad(1)='+str(vBDpad) + '|vBRpad(3)='+str(vBRpad) + '|aFpad(3)='+str(aFpad) + '|aBRpad(3)='+str(aBRpad))
 
-def LoopFiles(vFolder='.',level=1,each=False): # call FileInfo for videos and self on subfolders
-  global writeBuffer,NFOname0
+def LoopFiles(vFolder='.',vSRelBase='',level=1,each=False,Rec=True): # call FileInfo for videos, self on subfolders
+  global writeBuffer,NFOname0,vDictCol
+  vFdRel = os.path.abspath(vFolder).replace(vSRelBase+os.sep,'')
+
   level += 1
   spacer = indentlevel*level
   log(5,spacer + '[' + vFolder)
@@ -510,12 +512,12 @@ def main():
   # group.add_argument("-o","--out" , nargs='?',const="×Output", metavar="Name", help='Output file name [default: "×Output"; no flag: generated from files in the current folder]')
   log(2,args) #print command line ArgumentParser
 
-  vSource = os.path.normpath(args.input)
-  if vSource[-1] != '/': vSource += '/'
+  vSource = os.path.abspath(args.input)
+  vSRelBase = os.path.dirname(vSource) # Base to be removed from vSource to show relativePath
   log(4, '▶vSource : ' + vSource)
 
   #Create a global dictionary with all a/v info for all a/v files recursively
-  LoopFiles(vSource,level,args.each) # if -e also writes to file in each folder
+  LoopFiles(vSource,vSRelBase,level,args.each) # if -e also writes to file in each folder
 
   if args.out!='/': # use OutputName when it's given ('/' is the value when empty)
     target = os.path.normpath(vSource+os.sep+args.out) # (Win) converts / to \
