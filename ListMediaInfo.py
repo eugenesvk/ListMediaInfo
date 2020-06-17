@@ -257,6 +257,7 @@ def formatvStreamInfo(file, i, vStream):
   vH = '{msg:{fill}{align}{width}}'.format(msg=vH  ,fill=pad['F'],align='>',width=vHpad)
   vBD = '{msg:{fill}{align}{width}}'.format(msg=vBD,fill=pad['F'],align='>',width=vBDpad)
   vBR = '{msg:{fill}{align}{width}}'.format(msg=vBR,fill=pad['F'],align='>',width=vBRpad)
+  if padFormat: vF = vF.replace(' AVC',padF['AVC'])
   vWH = vW+'×'+vH
   log(1,'vEnc \t= {' + vEnc +'}')
   vEnd = ', ' if i>0 else '' # add a comma if several video streams
@@ -309,6 +310,7 @@ def formataStreamInfo(file, i, aStream, tSub): #parse Audio Stream info
   aF  = '{msg:{fill}{align}{width}}'.format(msg=aF ,fill=pad['S'],align='>',width=Fpad)
   aBR ='{:.0fhcss^1}'.format(FileSize(aBR)) #123456 → 123k
   aBR = '{msg:{fill}{align}{width}}'.format(msg=aBR,fill=pad['F'],align='>',width=BRpad)
+  if padFormat: aF = aF.replace(' AAC',padF['AAC'])
   # log(4,'aBitrate \t= {' + aBR +'}')
   aStart,aEnd,preL,aLangI = ('','','','')
   if i> 0: aStart =', +'+aT[:aTMax].lower()+' '	# Limit Title length→lower case

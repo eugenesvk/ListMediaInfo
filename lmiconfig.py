@@ -23,3 +23,10 @@ aBRpadMin  	= 3           	# ... audio Bit Rate (first track)...
 pad        	= {'S':' ','F':' ','P':' ','L':' '} # filler symbol for padding (use visible '°' for testing): S-regular, F-figure, P-punctuation, L-labels (em-width)
 extensions 	= ['.MP4','.AVI','.MOV','.M4V','.VOB','.MPG','.MPEG',\
            	   '.MKV','.WMV','.ASF','.FLV','.RM','.OGM','.M2TS','.RMVB']
+padFormat   = False # Adjust different widths of e.g. 'HE' vs 'A' or 'EAC3' vs 'AAC' for a given font to vertically align (but might mess up alignment in fixed-width editors)
+  # ' AVC'
+  # 'HEVC'
+Font  	=  'Cambria' # default font
+padFmt	= {'Cambria'	: {'AVC':'      AVC', 'AAC':' AAC'},\
+      	   'Font2'  	: {'AVC':'AVC', 'AVC':'AVC'},\
+}
