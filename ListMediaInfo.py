@@ -249,24 +249,24 @@ def formatvStreamInfo(i, vStream):
     vBR = vt['BitRate']
     vDict['vBR'].append(vBR)
     vBR ='{:.1fhcss^2}'.format(FileSize(vBR)) #1234567 → 1.2m
-  except:
-    vBR = '    ' #space equivalent of '1.2m'
-  try:
-    vEnc = (vt['Encoded_Library_Settings'])
-  except:
-    vEnc = ''
+  except	: vBR  = pad['F']+pad['P']+pad['F']+pad['L'] #space equivalent of '1.2m'
+  try   	: vEnc = (vt['Encoded_Library_Settings'])
+  except	: vEnc = ''
+  try   	: vDAR = (vt['DisplayAspectRatio'])
+  except	: vDAR = ''
   vDict['vF'].append(vF)
   vDict['vW'].append(vW)
   vDict['vH'].append(vH)
   vDict['vBD'].append(vBD)
-  vF = '{msg:{fill}{align}{width}}'.format(msg=vF,fill=padFill,align='>',width=vFpad)
-  vW = '{msg:{fill}{align}{width}}'.format(msg=vW,fill=padFill,align='>',width=vWpad)
-  vH = '{msg:{fill}{align}{width}}'.format(msg=vH,fill=padFill,align='>',width=vHpad)
-  vBD = '{msg:{fill}{align}{width}}'.format(msg=vBD,fill=padFill,align='>',width=vBDpad)
-  vBR = '{msg:{fill}{align}{width}}'.format(msg=vBR,fill=padFill,align='>',width=vBRpad)
-  if debug>4: print('vEnc \t= {' + vEnc +'}')
-  if i>0:	vEnd = ', '
-  else:  	vEnd = '\t'
+  vDict['vDAR'].append(vDAR)
+  vF = '{msg:{fill}{align}{width}}'.format(msg=vF  ,fill=pad['S'],align='>',width=vFpad)
+  vW = '{msg:{fill}{align}{width}}'.format(msg=vW  ,fill=pad['F'],align='>',width=vWpad)
+  vH = '{msg:{fill}{align}{width}}'.format(msg=vH  ,fill=pad['F'],align='>',width=vHpad)
+  vBD = '{msg:{fill}{align}{width}}'.format(msg=vBD,fill=pad['F'],align='>',width=vBDpad)
+  vBR = '{msg:{fill}{align}{width}}'.format(msg=vBR,fill=pad['F'],align='>',width=vBRpad)
+  vWH = vW+'×'+vH
+  log(1,'vEnc \t= {' + vEnc +'}')
+  vEnd = ', ' if i>0 else '' # add a comma if several video streams
   try: #type of rate control after 'rc=', e.g. 'crf' or '2 / pass'
     vrcType = re.search('(?<=rc=)(([a-z.]+)|(2 / pass)|(2pass))(?= / )', vEnc).group(0)
     vrcType = re.sub(' / ', '', vrcType) #remove ' / ' from '2 / pass'
@@ -316,15 +316,15 @@ def formataStreamInfo(i, aStream, tSub): #parse Audio Stream info
     vDict['aLang1'].append(aLang)
     vDict['aT1'].append(aT)
     Fpad,BRpad = (0,0)	# Don't pad Format/Bitrate for second+ streams
-  aF = '{msg:{fill}{align}{width}}'.format(msg=aF,fill=padFill,align='>',width=Fpad)
+  aF  = '{msg:{fill}{align}{width}}'.format(msg=aF ,fill=pad['S'],align='>',width=Fpad)
   aBR ='{:.0fhcss^1}'.format(FileSize(aBR)) #123456 → 123k
-  aBR = '{msg:{fill}{align}{width}}'.format(msg=aBR,fill=padFill,align='>',width=BRpad)
   aStart,aEnd,aLangI = ('','','')
   if i>0  : aStart = ', +' + aT[:aTMax].lower()+' '	# Limit Title length→lower case
   if i==0 : aEnd = tSub                            	# mark 1st aud stream as having a subtitle
   if aLang!='en': aLangI = ' ' +aLang              	# add language indicator unless 'en'
 
   data = aStart+aF+' '+aCh+'ch'+' '+str(aBR)+aLangI+aEnd
+  aBR = '{msg:{fill}{align}{width}}'.format(msg=aBR,fill=pad['F'],align='>',width=BRpad)
   # log(4,'data \t= {' + data +'}')
   return data #[, +Title] Codec Channels BitRate +Subtiles (e.g. 'AAC 6ch 192k +sub' or ', +comment AAC 2ch 60k'
 
