@@ -486,6 +486,9 @@ def LoopFiles(vFolder='.',vSRelBase='',level=1,each=False,Rec=True): # call File
       LoopFiles(vFolder+folder,level,each)
   if debug>0: print(spacer+' '+ vFolder +  ']')
   level = level - 1
+  else:
+    logging.error('This is not a folder!\n' + vFolder)
+    sys.exit()
 
 def writeBufferToFile(target): # write writeBuffer to file and reset it
   global writeBuffer
