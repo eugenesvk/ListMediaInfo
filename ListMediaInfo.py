@@ -349,14 +349,16 @@ def formattStreamInfo(file, i, tStream): #parse Text Stream info
 
 def storeFileInfo(vFolder,file,level,fi): #Store info for a video file in a global dictionary
   # Initialize
-  global vfDict
+  global vfDict, args
   vStreams,aStreams,tStreams = ([],[],[])
-  vFile = vFolder + file
+  vFile  = vFolder + file
   fvbase = os.path.basename(vFile)
   fvname = os.path.splitext(fvbase)[0]
+  fvext   = os.path.splitext(fvbase)[1]
   log(2,'storeFileInfo(' + vFolder +', ' + ', ' + file + ')')
   spacer = indentlevel*level
-  if not args.silent: print(spacer+' '+vFile) # list
+  if hasattr(args, 'silent'):
+    if not args.silent: print(spacer+' '+vFile) # list
 
   # Get MediaInfo as a JSON object (=Python dictionary) and extract media tracks
   MI      	= getMediaInfo(vFile)
@@ -378,7 +380,7 @@ def storeFileInfo(vFolder,file,level,fi): #Store info for a video file in a glob
   else:	tSub = ''
 
   # Store all the information in a file dictionary under the key 'file index'
-  vfDict.update({fi: {'fvname':fvname,'vStreams':vStreams,'aStreams':aStreams,'tStreams':tStreams,'tSub':tSub}})
+  vfDict.update({fi: {'fvname':fvname,'fvext':fvext,'vStreams':vStreams,'aStreams':aStreams,'tStreams':tStreams,'tSub':tSub}})
 
 def writeFileInfo(fi): #Read video file info from a global dictionary and write it to NFO
   global vfDict,writeBuffer
@@ -466,15 +468,17 @@ def LoopFiles(vFolder='.',vSRelBase='',level=1,each=False,Rec=True): # call File
       elif not(ext.upper() == '.JPG' or ext.upper() == '.TXT'):
         log(5,spacer + '→' + vFolder + file)
 
+    nfo = {}
     if filesNo==0:
       log(5,'No video files in this folder: ' + vFolder)
     else:
       Header = H1+'\t'+H2+'\t'+H3+'\n'
-      writeBuffer.append(fPrefix + vFolder + '\n' + Header) #Folder header info
+      writeBuffer.append(pPrefix + vFdRel + '\n' + Header) #Folder header info
       setPadValues(filesNo)
       for i in range(filesNo): writeFileInfo(i)
-      NFOname = getNFOname(vFolder)
+      nfo = getNFOname(vFolder)
       log(2, nfo['vF'] +' '+ nfo['vDim'] +' '+ nfo['vBR'] +' '+ nfo['vBD']+' '+ nfo['vRC'] +', '+ nfo['aF'] +' '+ nfo['aCh'] +' '+ nfo['aBR'] +' '+ nfo['Lang']+' '+ nfo['Sub'] + nfo['aF1'] +' '+ nfo['aCh1'] +' '+ nfo['aBR1'])
+      NFOname = nfo['Out'] + NFOSrc
       if level==1: NFOname0 = NFOname
       writeBuffer.append('———NFO[' + NFOname + ']\n\n')
       if each: # write NFO separately for each folder
@@ -482,13 +486,15 @@ def LoopFiles(vFolder='.',vSRelBase='',level=1,each=False,Rec=True): # call File
         writeBufferToFile(target)
         pass
 
-    for folder in folders(vFolder):
-      LoopFiles(vFolder+folder,level,each)
-  if debug>0: print(spacer+' '+ vFolder +  ']')
-  level = level - 1
+    if Rec:
+      for folder in folders(vFolder): LoopFiles(vFolder+folder,vSRelBase,level,each)
   else:
     logging.error('This is not a folder!\n' + vFolder)
     sys.exit()
+
+  log(5,spacer+' '+ vFolder +  ']')
+  level -= 1
+  return nfo
 
 def writeBufferToFile(target): # write writeBuffer to file and reset it
   global writeBuffer
