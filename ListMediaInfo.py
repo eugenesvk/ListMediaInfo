@@ -381,6 +381,7 @@ def formatvStreamInfo(file, i, vStream):
   vF,vW,vH,vBD = (vt['Format'],vt['Width'],vt['Height'],vt['BitDepth'])
   try: vF = re.search('\\w*(?= )', vF.replace('-','')).group(0) #MPEG-4 Video → MPEG
   except: pass
+  vColRaw = {'vF':vF,'vW':vW,'vH':vH,'vBD':vBD}
   try:
     vBR = vt['BitRate']
     vDict['vBR'].append(vBR); vColRaw['vBR']=vBR
@@ -461,6 +462,7 @@ def formataStreamInfo(file, i, aStream, tSub): #parse Audio Stream info
   try   	: aT = at['Title']
   except	: pass
   aF = aF.replace('-','') #E-AC3→EAC3
+  aColRaw  = {'aF':aF, 'aCh':aCh, 'aBR':aBR, 'aLang':aLang, 'aSub':tSub}
   if i==0:
     vDict['aF'].append(aF)
     vDict['aCh'].append(aCh)
