@@ -17,23 +17,111 @@ from logging import log as log
 import locale
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
-from lmiconfig import * # import global vars from an external config
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logMin)
+import strictyaml          	# config loader and validator
+from strictyaml import load, Map, Str, Int, Seq, Bool, Float, Enum, Any, Optional, YAMLError
 
-recDD = lambda: ddict(recDD) # recursive dicts, allows x['a']['b']['c']['d'] w/o KeyError
+def parseConfig(): # load config values from cfgFileName@cfgFolder
+  logging.basicConfig(format='log.L%(levelno)s: %(message)s', level=6)
+  dirs = AppDirs('ListMediaInfo', '')
 
-def setGlobals(): # Set global variables
-  global NFOname0,vSource,vDict,vfDict,vDictCol,writeBuffer,level,padF,args, pPrefix
-  NFOname0   	= ''          	# (empty) NFO file name for the top folder
-  vSource    	= '.'         	# (redundant?) Default path — current folder
-  vDict      	= ddict(list) 	# Stores selected file info to generate folder.nfo
-  vfDict     	= {}          	# Stores all file info ~{'fIndex': {'fCat1':fCat1,...}}
-  vDictCol   	= recDD()     	# Stores formatted file info for A/V columns
-  writeBuffer	= []          	# Buffer to write .nfo data to instead of directly to file
-  level      	= 0           	# Folder level
-  padF       	= padFmt[Font]	# width diff 'HE' vs 'A' @Font: .replace(' AVC',padF['AVC'])
-  args       	= argparse.ArgumentParser() # Empty argparse object
-  pPrefix    	= pPrefix if pPrefix>'' else os.sep # Path separator
+  cfgFiles = []
+  cfgFileName = ['lmiconfig.yaml', 'lmiconfig.yml', 'config.yaml', 'config.yml', '.lmiconfig.yaml', '.lmiconfig.yml']
+  scriptFd = PurePath(__file__).parent
+  cfgFolder = ['~/.config/ListMediaInfo', dirs.user_config_dir, '~', scriptFd]
+  for folder in cfgFolder:
+    for file in cfgFileName:
+      cfgFiles.append(PurePath(Path(folder).expanduser(),file))
+
+  padFmtSchema = Map(
+    {'AVC':Str() , 'AAC':Str() , 'AC3':Str() , 'm':Str() , 'colon':Str()})
+  padFmtDef = odict({'Cambria':
+    {'AVC':'      AVC', 'AAC':' AAC', 'AC3':'   AC3', 'colon':'  '}})
+  cfgSchema = Map({\
+  Optional('logMin'     	, default='6')         	: Int(),
+  Optional('H1'         	, default='Name')      	: Str(),
+  Optional('H2'         	, default='Video')     	: Str(),
+  Optional('H3'         	, default='Audio&Subs')	: Str(),
+  Optional('pPrefix'    	, default='')          	: Str(),
+  Optional('NFOPre'     	, default='Name [')    	: Str(),
+  Optional('NFOSrc'     	, default=', Src')     	: Str(),
+  Optional('NFOSuf'     	, default='].nfo')     	: Str(),
+  Optional('jRange'     	, default='–')         	: Str(),
+  Optional('jGen'       	, default='-')         	: Str(),
+  Optional('vDimLimit'  	, default='1.15')      	: Float(),
+  Optional('indentlevel'	, default='  ')        	: Str(),
+  Optional('aTMax'      	, default='7')         	: Int(),
+  Optional('vFpadMin'   	, default='3')         	: Int(),
+  Optional('vWpadMin'   	, default='3')         	: Int(),
+  Optional('vHpadMin'   	, default='3')         	: Int(),
+  Optional('vBRpadMin'  	, default='3')         	: Int(),
+  Optional('vBDpadMin'  	, default='1')         	: Int(),
+  Optional('aFpadMin'   	, default='3')         	: Int(),
+  Optional('aBRpadMin'  	, default='3')         	: Int(),
+  Optional('padFormat'  	, default='N')         	: Bool(),
+  Optional('Font'       	, default='Cambria')   	: Str(),
+  Optional('padFmt'     	, default=padFmtDef)   	: Any(),
+  Optional('libPath'    	, default=[''])        	: Seq(Str()),
+  })
+
+  for f in cfgFiles:
+    if not Path(f).is_file(): continue # skip non-file items
+    try:
+      cfgParse = load(Path(f).read_text(), cfgSchema)
+      cfg = cfgParse.data
+      for Font in cfg['padFmt']: # Revalidate Font offset options
+        cfgParse['padFmt'][Font].revalidate(padFmtSchema)
+    except YAMLError as err:
+      print("%s: %s" % (f, err), file=sys.stderr)
+      sys.exit()
+    else:
+      file_read = f
+      log(5,'Loading config from ' + str(f))
+      break
+  else:
+    log(5,"Can't find config file anywhere, using default values")
+    log(4,"\n".join([str(Path(x)) for x in cfgFiles]))
+    cfg = load('logMin : 6', cfgSchema).data
+  return cfg
+
+# Set Global variables and load an external config file
+NFOname0   	= ''         	# (empty) NFO file name for the top folder
+vSource    	= '.'        	# (redundant?) Default path — current folder
+vDict      	= ddict(list)	# Stores selected file info to generate folder.nfo
+vfDict     	= {}         	# Stores all file info ~{'fIndex': {'fCat1':fCat1,...}}
+vDictCol   	= {}         	# Stores formatted file info for A/V columns
+writeBuffer	= []         	# Buffer to write .nfo data to instead of directly to file
+level      	= 0          	# Folder level
+
+args	= argparse.ArgumentParser()	# Empty argparse object
+pad = space = {'s':' ','m':' ','n':' ','f':' ','p':' ','t':' ','h':' ','z':'​','u':'␣'}
+# filler symbol for padding (use visible '°' for testing): S-regular, F-figure, P-punctuation
+# extVid	= ['.mp4','.avi','.mov','.m4v','.vob','.mpg','.mpeg',\
+#                '.mkv','.wmv','.asf','.flv','.rm','.ogm','.m2ts','.rmvb']
+exts = ['.mkv','.mka','.mks','.ogg','.ogm','.avi','.wav','.mpeg','.mpg','.vob'\
+         ,'.mp4','.mpgv','.mpv','.m1v','.m2v','.mp2','.mp3','.asf','.wma','.wmv'\
+         ,'.qt','.mov','.rm','.rmvb','.ra','.ifo','.ac3','.dts','.aac','.ape','.mac'\
+         ,'.flac','.dat','.aiff','.aifc','.au','.iff','.paf','.sd2','.irca','.w64'\
+         ,'.mat','.pvf','.xi','.sds','.avr']
+         #mediaarea.net/en/MediaInfo/Support/Formats
+
+cfg                   	= parseConfig()	# Load config file and
+logMin                	= cfg['logMin']
+(H1,H2,H3)            	= (cfg['H1'],cfg['H2'],cfg['H3'])
+pPrefix               	= cfg['pPrefix']
+(NFOPre,NFOSrc,NFOSuf)	= (cfg['NFOPre'],cfg['NFOSrc'],cfg['NFOSuf'])
+(jRange,jGen)         	= (cfg['jRange'],cfg['jGen'])
+vDimLimit             	= cfg['vDimLimit']
+indentlevel           	= cfg['indentlevel']
+aTMax                 	= cfg['aTMax']
+padFormat             	= cfg['padFormat']
+Font                  	= cfg['Font']
+padF                  	= cfg['padFmt'][cfg['Font']]
+pPrefix               	= cfg['pPrefix'] if cfg['pPrefix']>'' else os.sep # Path separator
+libPath               	= cfg['libPath']
+
+(vFpadMin,vWpadMin,vHpadMin,vBRpadMin,vBDpadMin,aFpadMin,aBRpadMin) = (cfg['vFpadMin'],cfg['vWpadMin'],cfg['vHpadMin'],cfg['vBRpadMin'],cfg['vBDpadMin'],cfg['aFpadMin'],cfg['aBRpadMin'])
+
+logging.basicConfig(format='log.L%(levelno)s: %(message)s', level=logMin, force=True) # change
 
 def files(path):
   for item in os.listdir(path):
@@ -461,7 +549,7 @@ def LoopFiles(vFolder='.',vSRelBase='',level=1,each=False,Rec=True): # call File
 
     for file in filesorted(vFolder):
       ext = os.path.splitext(file)[1]
-      if ext.upper() in extensions:
+      if ext.lower() in exts:
         storeFileInfo(vFolder, file, level, filesNo) #Store file info in a global dictionary
         filesNo += 1
       elif not(ext.upper() == '.JPG' or ext.upper() == '.TXT'):
@@ -523,7 +611,6 @@ def writeBufferToFile(target): # write writeBuffer to file and reset it
   writeBuffer=[]
 
 def main():
-  setGlobals() # set global vars
   parser = argparse.ArgumentParser(description="Create a list of video files with key Vid/Aud info formatted like this\n(tab-separted columns, (variable width) space-padded values for vertical alignment)\n"+"  "+H1+"\t"+H2+"                       \t"+H3+"""
     N1\t AVC 1920×1080 0.8m  8b      \tEAC3 6ch 640k de
     N2\tHEVC  704× 468 0.6m 10b crf24\t AAC 2ch  66k +s, +comment AAC 2ch 66k
