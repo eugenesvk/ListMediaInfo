@@ -307,10 +307,10 @@ def formataStreamInfo(file, i, aStream, tSub): #parse Audio Stream info
     vDict['aLang1'].append(aLang)
     vDict['aT1'].append(aT)
     Fpad,BRpad = (0,0)	# Don't pad Format/Bitrate for second+ streams
-  aF  = '{msg:{fill}{align}{width}}'.format(msg=aF ,fill=pad['S'],align='>',width=Fpad)
+  aF  = '{msg:{fill}{align}{width}}'.format(msg=aF ,fill=pad['s'],align='>',width=Fpad)
   aBR ='{:.0fhcss^1}'.format(FileSize(aBR)) #123456 → 123k
-  aBR = '{msg:{fill}{align}{width}}'.format(msg=aBR,fill=pad['F'],align='>',width=BRpad)
-  if padFormat: aF = aF.replace(' AAC',padF['AAC'])
+  aBR = '{msg:{fill}{align}{width}}'.format(msg=aBR,fill=pad['f'],align='>',width=BRpad)
+  if padFormat: aF = aF.replace(' AAC',padF['AAC']).replace(' AC3',padF['AC3'])
   # log(4,'aBitrate \t= {' + aBR +'}')
   aStart,aEnd,preL,aLangI = ('','','','')
   if i> 0: aStart =', +'+aT[:aTMax].lower()+' '	# Limit Title length→lower case
@@ -369,15 +369,12 @@ def storeFileInfo(vFolder,file,level,fi): #Store info for a video file in a glob
   # Split MediaInfo data into separate Vid/Aud/Text streams
   for i in range(len(MITracks)): #Create list of video/audio/text stream
     track = MITracks[i]
-    if (track['@type'] == 'Video'):
-      vStreams.append(track)
-    elif (track['@type'] == 'Audio'):
-      aStreams.append(track)
-    elif (track['@type'] == 'Text'):
-      tStreams.append(track)
+    if   track['@type'] == 'Video'	: vStreams.append(track)
+    elif track['@type'] == 'Audio'	: aStreams.append(track)
+    elif track['@type'] == 'Text' 	: tStreams.append(track)
 
   if len(tStreams)>0: # Test if subtitles exist
-    tSub = '+sub'
+    tSub = '+s'
     vDict['tSub'].append(tSub)
   else:	tSub = ''
 
@@ -423,7 +420,7 @@ def setPadValues(filesNo): #set padding values to match the max value in range
     vStreams = vfDict[fi]['vStreams']
     aStreams = vfDict[fi]['aStreams']
     for j in range(len(vStreams)): # for each stream, get max length of var to pad to
-      log(1,'fvname,fi,j'+"|"+vfDict[fi]['fvname']+"|"+str(fi)+"|"+str(j))
+      log(1,'fvname,fi,j'+'|'+vfDict[fi]['fvname']+'|'+str(fi)+'|'+str(j))
       try:
         vt	= vStreams[j]
         vF,vW,vH,vBD = (vt['Format'],vt['Width'],vt['Height'],vt['BitDepth'])
@@ -529,11 +526,11 @@ def main():
   setGlobals() # set global vars
   parser = argparse.ArgumentParser(description="Create a list of video files with key Vid/Aud info formatted like this\n(tab-separted columns, (variable width) space-padded values for vertical alignment)\n"+"  "+H1+"\t"+H2+"                       \t"+H3+"""
     N1\t AVC 1920×1080 0.8m  8b      \tEAC3 6ch 640k de
-    N2\tHEVC  704× 468 0.6m 10b crf24\t AAC 2ch  66k +sub, +comment AAC 2ch 66k
+    N2\tHEVC  704× 468 0.6m 10b crf24\t AAC 2ch  66k +s, +comment AAC 2ch 66k
 
   where
     Vid\tFormat Width×Height Bitrate Bitdepth RateControl Type/Quality
-    Aud\t[Track#1] Format #ofChannels Bitrate Language≠en +Subtitle, [Track#2+] +Title ...
+    Aud\t[Track#1] Format #ofChannels Bitrate Language≠en +Subtitle(s), [Track#2+] +Title ...
 
   ...and a summary NFO file name with the list/count/average/range of values:\n  """+NFOPre+"AVC-HEVC 468-1080p 0.6-0.8m 8-10b crf24, AAC-EAC3 2-6ch 66-640k +s, +c AAC 2ch 66k"+NFOSrc+NFOSuf, formatter_class=RawDHF)
   group = parser.add_mutually_exclusive_group()
