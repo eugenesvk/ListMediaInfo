@@ -145,6 +145,20 @@ def unique(ilist): # function to get unique values
   list_set   	= set(ilist)      	# insert the list to the set
   unique_list	= (list(list_set))	# convert the set to the list
   return unique_list
+def padTime(s, m, h, colW=padF['colon']):
+  divH = divM = ':'
+  if h==0	:
+    h    	= pad['f']*2
+    divH 	= colW
+    divM 	= colW if m==0 else divM
+  else   	: h = '{msg:{fill}{align}{width}}'.format(msg=h,fill=pad['f'],align='>',width=2)
+  if m==0	: m	= pad['f']*2
+  else   	: m = '{msg:{fill}{align}{width}}'.format(msg=m,fill=pad['f'],align='>',width=2)
+  if s==0	: s	= pad['f']*2
+  else   	: s = '{msg:{fill}{align}{width}}'.format(msg=s,fill=pad['f'],align='>',width=2)
+  paddedTime = h+divH + m+divM + s
+  return paddedTime
+
 def resetVarList(): #reset global varibles for each new folder
   global vfDict,vDict,vDictCol
   vfDict, vDictCol, vDict	= ({}, recDD(), ddict(list))
@@ -376,6 +390,8 @@ def formatvStreamInfo(file, i, vStream):
   except	: vEnc = ''
   try   	: vDAR = (vt['DisplayAspectRatio'])
   except	: vDAR = ''
+  try   	: vDur = int(round(float(vt['Duration']),0))
+  except	: vDur = ''
   vDict['vF'].append(vF)
   vDict['vW'].append(vW)
   vDict['vH'].append(vH)
@@ -386,6 +402,10 @@ def formatvStreamInfo(file, i, vStream):
   vH = '{msg:{fill}{align}{width}}'.format(msg=vH  ,fill=pad['F'],align='>',width=vHpad)
   vBD = '{msg:{fill}{align}{width}}'.format(msg=vBD,fill=pad['F'],align='>',width=vBDpad)
   vBR = '{msg:{fill}{align}{width}}'.format(msg=vBR,fill=pad['F'],align='>',width=vBRpad)
+  m, s = divmod(vDur, 60)
+  s = int(round(s,0)) # round and convert float seconds
+  h, m = divmod(m, 60)
+  vDur = padTime(s,m,h)
   if padFormat: vF = vF.replace(' AVC',padF['AVC'])
   vWH = vW+'×'+vH
   log(1,'vEnc \t= {' + vEnc +'}')
