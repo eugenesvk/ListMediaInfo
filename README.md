@@ -28,26 +28,39 @@ For example, with the two files listed above the summary file name would have a 
 
 # Configuration
 
-Key formatting variables used by this script are read from configuration file [__lmiconfig.py__](./lmiconfig.py), an excerpt from which is shown below:
+Key formatting variables used by this script are read from an optional [strictyaml](github.com/crdoconnor/strictyaml) configuration file, which (priority decreasing from left to right):
+  - can be located@: '~/.config/ListMediaInfo', os-default user config path (e.g. %LocalAppData%\ListMediaInfo on Windows), '~', script's location
+  - can be named as: 'lmiconfig.yaml' or 'config.yaml' or '.lmiconfig.yaml'
+...with defaults set as follows:
 ```
-H1       	= 'Name'      	# Header for Column 1
-H2       	= 'Video'     	# Header for Column 2
-H3       	= 'Audio&Subs'	# Header for Column 3
-fPrefix  	= '×'         	# Prefix symbol for ×/path/to/folder/
-NFOPre   	= '×Name ['   	# NFO file name prefix
-NFOSuf   	= '].nfo'     	#               suffix, including extension
-jRange   	= '–'         	# join elements of a numeric list (en-dash '–')
-jGen     	= '-'         	# join elements of a non-numeric list (dash '-')
-vDimLimit	= 1.15        	# (in NFO file name) use average Height instead of the full range if the values are within this range (e.g. if 480p is only 11%<15% higher than 432p, so file name will have ~456p (average of 432 and 480) instead of 432-480p)
-aTMax    	= 7           	# limit length of Audio title to this #, e.g. comment instead of commentary
-padFill  	= ' '         	# filler symbol for padding (use visible '°' for testing)
-vFpadMin 	= 3           	# pad Format/Codec name to at least this number of digits
-vWpadMin 	= 3           	# ... Width ...
-vHpadMin 	= 3           	# ... Height ...
-vBRpadMin	= 3           	# ... video Bit Rate ...
-vBDpadMin	= 1           	# ... video Bit Depth ...
-aFpadMin 	= 3           	# ... audio Format/Codec name ...
-aBRpadMin	= 3           	# ... audio Bit Rate (first track)...
+logMin      : 6             # min logging threshold (1–5, 6+ hides all)
+H1          : Name          # Header for Column 1
+H2          : Video         # Header for Column 2
+H3          : Audio&Subs    # Header for Column 3
+pPrefix     : ''            # Prefix symbol for \VideoFolder (blank for os path separator)
+NFOPre      : Name [        # NFO file name prefix
+NFOSrc      : ', Src'       #               placeholder for source
+NFOSuf      : '].nfo'       #               suffix, including extension
+jRange      : '–'           # join elements of a numeric list (en-dash '–')
+jGen        : '-'           # join elements of a non-numeric list (dash '-')
+vDimLimit   : 1.15          # (in NFO file name) use average Height instead of the full range if the values are within this range (e.g. if 480p is only 11%<15% higher than 432p, so file name will have ~456p (average of 432 and 480) instead of 432-480p)
+indentlevel : '  '          # log indentation level: '  /Path/2/Folder'
+aTMax       : 7             # limit length of Audio title to this # (commentary→comment)
+vFpadMin    : 3             # pad Format/Codec name to at least this number of digits
+vWpadMin    : 3             # ... Width ...
+vHpadMin    : 3             # ... Height ...
+vBRpadMin   : 3             # ... video Bit Rate ...
+vBDpadMin   : 1             # ... video Bit Depth ...
+aFpadMin    : 3             # ... audio Format/Codec name ...
+aBRpadMin   : 3             # ... audio Bit Rate (first track)...
+padFormat   : Y             #Y/N Adjust different widths to vertically align. This is font-specific and might mess up alignment in fixed-width editors
+Font        : Cambria     # default font
+padFmt      :
+  Cambria   :
+    AVC     : '      AVC'       # = 'HEVC'
+    AAC     : ' AAC'        # = 'EAC3'
+    AC3     : '   AC3'        # = 'EAC3'
+    m       : '     '          # = 'm'
 ```
 
 # Requirements
@@ -63,6 +76,8 @@ pip install pymediainfo             	# wrapper to access MediaInfo library
 pip install -e "/path/to/hfilesize/"	# get from github.com/eugenesvk/hfilesize (it has an extra 'css' style without space and the useless 'b' indicator)
 OR                                  	# when/if [PR](github.com/simonzack/hfilesize/pull/4) is merged
 pip install hfilesize
+pip install AppDirs
+pip install strictyaml
 ```
 
 # Command Line flags
