@@ -320,8 +320,24 @@ def getNFOname(vFolder):
 
   return FileName
 
-def getMediaInfo(mediafile): #pymediainfo import MediaInfo as wrapMI
-  MIJSON = wrapMI.parse(mediafile, output='JSON')
+def getMediaInfo(mediafile):
+  if libPath == ['']:
+    MIJSON = pmi.MediaInfo.parse(mediafile, output='JSON')
+  else:
+    for f in libPath:
+      if not Path(f).is_file(): continue # skip non-file items
+      try:
+        MIJSON = pmi.MediaInfo.parse(mediafile, output='JSON', library_file=f)
+      except OSError:
+        continue
+      else: break
+    else:
+      logging.error("Can't find MediaInfo.dll, aborting! Looked here:")
+      print("\n".join([str(Path(x)) for x in libPath]))
+      if libPath == ['']:
+        print(PurePath(PurePath(pmi.__file__).parent,'MediaInfo.dll'))
+        print(PurePath(PurePath(__file__).parent,'MediaInfo.dll'))
+      sys.exit()
   data = json.loads(MIJSON) #Decode JSON: Deserialize stdout to a Python object (object→dict)
   return data
 
