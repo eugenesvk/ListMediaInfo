@@ -383,10 +383,10 @@ def formatvStreamInfo(file, i, vStream):
   except: pass
   try:
     vBR = vt['BitRate']
-    vDict['vBR'].append(vBR)
+    vDict['vBR'].append(vBR); vColRaw['vBR']=vBR
     vBR ='{:.1fhcss^2}'.format(FileSize(vBR)) #1234567 → 1.2m
-  except	: vBR  = pad['F']+pad['P']+pad['F']+pad['L'] #space equivalent of '1.2m'
-  try   	: vEnc = (vt['Encoded_Library_Settings'])
+  except	: vBR  = space['f']+space['p']+space['f']+padF['m'] #space equivalent of '1.2m'
+  try   	: vEnc = vt['Encoded_Library_Settings']
   except	: vEnc = ''
   try   	: vDAR = vt['DisplayAspectRatio_String']
   except	: vDAR = ''
@@ -399,17 +399,16 @@ def formatvStreamInfo(file, i, vStream):
   try   	: vDur = int(round(float(vt['Duration']),0))
   except	: vDur = ''
   vDict['vF'].append(vF)
-  vDict['vW'].append(vW)
-  vDict['vH'].append(vH)
+  vDict['vW'].append(vW); vDict['vH'].append(vH)
   vDict['vBD'].append(vBD)
-  vF = '{msg:{fill}{align}{width}}'.format(msg=vF  ,fill=pad['S'],align='>',width=vFpad)
-  vW = '{msg:{fill}{align}{width}}'.format(msg=vW  ,fill=pad['F'],align='>',width=vWpad)
-  vH = '{msg:{fill}{align}{width}}'.format(msg=vH  ,fill=pad['F'],align='>',width=vHpad)
-  vBD = '{msg:{fill}{align}{width}}'.format(msg=vBD,fill=pad['F'],align='>',width=vBDpad)
-  vBR = '{msg:{fill}{align}{width}}'.format(msg=vBR,fill=pad['F'],align='>',width=vBRpad)
   vDict['vDAR'].append(vDAR); vColRaw['vDAR'] = vDAR
   vColRaw['vFR'] = vFR; vColRaw['vDur'] = vDur
   vFRratio = vFRNum + vFRdiv + vFRDen
+  vF  = '{msg:{fill}{align}{width}}'.format(msg=vF ,fill=pad['s'],align='>',width=vFpad)
+  vW  = '{msg:{fill}{align}{width}}'.format(msg=vW ,fill=pad['f'],align='>',width=vWpad)
+  vH  = '{msg:{fill}{align}{width}}'.format(msg=vH ,fill=pad['f'],align='>',width=vHpad)
+  vBD = '{msg:{fill}{align}{width}}'.format(msg=vBD,fill=pad['f'],align='>',width=vBDpad)
+  vBR = '{msg:{fill}{align}{width}}'.format(msg=vBR,fill=pad['f'],align='>',width=vBRpad)
   m, s = divmod(vDur, 60)
   s = int(round(s,0)) # round and convert float seconds
   h, m = divmod(m, 60)
@@ -499,7 +498,7 @@ def formataStreamInfo(file, i, aStream, tSub): #parse Audio Stream info
   vDictCol[file]['AudioFullF'].update(	{i:aDataColFF})
   vDictCol[file]['AudioRaw'].update(  	{i:aColRaw})
   # log(4,'data \t= {' + data +'}')
-  return data #[, +Title] Codec Channels BitRate +Subtiles (e.g. 'AAC 6ch 192k +sub' or ', +comment AAC 2ch 60k'
+  return data #[, +Title] Codec Channels BitRate +Subtiles (e.g. 'AAC 6ch 192k +s' or ', +comment AAC 2ch 60k'
 
 def formattStreamInfo(file, i, tStream): #parse Text Stream info
   global vDict, vDictCol
