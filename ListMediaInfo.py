@@ -161,7 +161,7 @@ def padTime(s, m, h, colW=padF['colon']):
 
 def resetVarList(): #reset global varibles for each new folder
   global vfDict,vDict,vDictCol
-  vfDict, vDictCol, vDict	= ({}, recDD(), ddict(list))
+  vfDict, vDict, vDictCol	= ({}, ddict(list), {})
   global vFpad,vWpad,vHpad,vBRpad,vBDpad,aFpad,aBRpad
   vFpad,vWpad,vHpad,vBRpad,vBDpad,aFpad,aBRpad = (vFpadMin,vWpadMin,vHpadMin,vBRpadMin,vBDpadMin,aFpadMin,aBRpadMin)
 
@@ -425,10 +425,16 @@ def formatvStreamInfo(file, i, vStream):
 
   data = vF+' '+vWH+' '+str(vBR)+' '+vBD+'b'+vRC+vEnd
   # fill data for Columns
-  vDataCol = {'vF':vF,'vWH':vWH,'vW':vW,'vH':vH,'vBR':str(vBR),'vBD':vBD+'b','vRC':vRC,'vDAR':vDAR}
-  vDataColF = vF+' '+vWH+' '+str(vBR)+' '+vBD+'b'+vRC
-  vDictCol[file]['Video'].update({i:vDataCol})
-  vDictCol[file]['VideoFull'].update({i:vDataColF})
+  vDataCol = {'vF':vF, 'vWH':vWH,'vW':vW,'vH':vH, 'vBR':str(vBR),'vBD':vBD+'b','vRC':vRC, 'vDAR':vDAR, 'vFR':vFRratio, 'vDur':vDur}
+  vDataColF = vWH+' '+str(vBR)+' '+vBD+'b'+vRC
+  vDataColFF = vF+' '+vDataColF
+  vDictCol.setdefault(file, {}) # creates keys if they don't exist, but doesn't overwrite existing ones
+  keys = ['Video','VideoFull','VideoFullF','VideoRaw']
+  for k in keys: vDictCol[file].setdefault(k,{})
+  vDictCol[file]['Video'].update(     	{i:vDataCol})
+  vDictCol[file]['VideoFull'].update( 	{i:vDataColF})
+  vDictCol[file]['VideoFullF'].update(	{i:vDataColFF})
+  vDictCol[file]['VideoRaw'].update(  	{i:vColRaw})
   return data #Codec Width×Height BitRate BitDepth
 
 def formataStreamInfo(file, i, aStream, tSub): #parse Audio Stream info
@@ -470,10 +476,16 @@ def formataStreamInfo(file, i, aStream, tSub): #parse Audio Stream info
 
   data = aStart+aF+' '+aCh+'ch'+' '+str(aBR)+ preL+aLangI+aEnd
   # fill data for Columns
-  aDataCol  = {'aF':aF, 'aCh':aCh+'ch', 'aBR':str(aBR), 'preL':preL,'aLangI':aLangI, 'aSub':aEnd}
-  aDataColF = aF+' '+aCh+'ch'+' '+str(aBR)+ preL+aLangI+aEnd
-  vDictCol[file]['Audio'].update({i:aDataCol})
-  vDictCol[file]['AudioFull'].update({i:aDataColF})
+  aDataCol  = {'aF':aF, 'aCh':aCh+'ch', 'aBR':str(aBR), 'preL':preL,'aLangI':aLangI,'aLang':aLang, 'aSub':aEnd}
+  aDataColF = aCh+'ch'+' '+str(aBR)+ preL+aLangI+aEnd
+  aDataColFF = aF+' '+aDataColF
+  vDictCol.setdefault(file, {})
+  keys = ['Audio','AudioFull','AudioFullF','AudioRaw']
+  for k in keys: vDictCol[file].setdefault(k,{})
+  vDictCol[file]['Audio'].update(     	{i:aDataCol})
+  vDictCol[file]['AudioFull'].update( 	{i:aDataColF})
+  vDictCol[file]['AudioFullF'].update(	{i:aDataColFF})
+  vDictCol[file]['AudioRaw'].update(  	{i:aColRaw})
   # log(4,'data \t= {' + data +'}')
   return data #[, +Title] Codec Channels BitRate +Subtiles (e.g. 'AAC 6ch 192k +sub' or ', +comment AAC 2ch 60k'
 
@@ -494,6 +506,9 @@ def formattStreamInfo(file, i, tStream): #parse Text Stream info
   data = preL+tLang
   # fill data for Columns
   tDataCol  = {'tF':tF, 'preL':preL,'tLang':tLang}
+  vDictCol.setdefault(file, {})
+  keys = ['Sub']
+  for k in keys: vDictCol[file].setdefault(k,{})
   vDictCol[file]['Sub'].update({i:tDataCol})
   log(4,'formattStreamInfo: ' + data)
   return data # Subtitle Language (e.g. 'en de es')
