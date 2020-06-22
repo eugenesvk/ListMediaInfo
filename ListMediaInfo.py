@@ -1,22 +1,27 @@
 #!/usr/bin/env python3
 
+# stdlib
 import sys, os
 from os import listdir
 from os.path import isfile, join
 import subprocess
 import json
 import re
+from pathlib import Path, PurePath
+from collections import OrderedDict as odict
 from collections import defaultdict as ddict # allows autocreation of empty keys
-import argparse
-from argparse import RawDescriptionHelpFormatter as RawDHF, RawTextHelpFormatter
-from pymediainfo import MediaInfo as wrapMI
-from hfilesize import Format, FileSize
-from natsort import natsorted, humansorted, ns
 import logging
 from logging import log as log
 import locale
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
+# external packages
+import argparse
+from argparse import RawDescriptionHelpFormatter as RawDHF, RawTextHelpFormatter
+import pymediainfo as pmi
+from hfilesize import Format, FileSize
+from natsort import natsorted, humansorted, ns
+from appdirs import AppDirs	# os-specific user folders
 import strictyaml          	# config loader and validator
 from strictyaml import load, Map, Str, Int, Seq, Bool, Float, Enum, Any, Optional, YAMLError
 
