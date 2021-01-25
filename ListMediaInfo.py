@@ -433,7 +433,7 @@ def formatvStreamInfo(file, i, vStream):
   if passes == '0': passes = ''
   vRC = vrcType + vrcValue + passes
   vColRaw['vRC']=vRC
-  vRC += ' ' if vRC>'' else ''
+  vRC = (' ' if vRC>'' else '')+vRC
 
   data = vF+' '+vWH+' '+str(vBR)+' '+vBD+'b'+vRC+vEnd
   # fill data for Columns
