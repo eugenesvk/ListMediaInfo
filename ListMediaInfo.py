@@ -715,7 +715,7 @@ def main():
   parser.add_argument("-s","--silent" , action="store_true", help="hide list of processed files")
   group.add_argument("out"            , nargs='?',default="/", metavar="OutputName", help='Output file name [default="/": generate from files in the current folder]')
   groupI = parser.add_argument_group('optional info arguments')
-  groupI.add_argument('-v','--version'  , action='version', version='%(prog)s 1.3@20-6')
+  groupI.add_argument('-v','--version'  , action='version', version='%(prog)s 2.0@21-1')
   global args
   args = parser.parse_args()
   # group.add_argument("-o","--out" , nargs='?',const="×Output", metavar="Name", help='Output file name [default: "×Output"; no flag: generated from files in the current folder]')
