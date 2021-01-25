@@ -29,8 +29,10 @@ For example, with the two files listed above the summary file name would have a 
 # Configuration
 
 Key formatting variables used by this script are read from an optional [strictyaml](github.com/crdoconnor/strictyaml) configuration file, which (priority decreasing from left to right):
-  - can be located@: '~/.config/ListMediaInfo', os-default user config path (e.g. %LocalAppData%\ListMediaInfo on Windows), '~', script's location
-  - can be named as: 'lmiconfig.yaml' or 'config.yaml' or '.lmiconfig.yaml'
+
+- can be located at: `~/.config/ListMediaInfo`, OS-default user config path (e.g. `%LocalAppData%\ListMediaInfo` on Windows), `~`, script's location
+- can be named as: `lmiconfig.yaml` or `config.yaml` or `.lmiconfig.yaml`
+
 ...with defaults set as follows:
 ```
 logMin      : 6             # min logging threshold (1–5, 6+ hides all)
