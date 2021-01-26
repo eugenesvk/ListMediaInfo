@@ -184,13 +184,18 @@ def getNFOname(vFolder):
   vH    	= list(map(int,(unique(vDict['vH']))))	#Unique list of Heights, →int for sorting
   vHFull	= list(map(int,vDict['vH']))          	#Full list of Heights, →int for sorting
   vWxH  	= [str(a)+'×'+str(b) for a,b in zip(vW,vH)] #string
-  vHmin 	= min(vH); vHmax = max(vH); vHavg = int(sum(vHFull)/float(len(vHFull)))
+
+  if vH:    	vHmin = min(vH); vHmax = max(vH)
+  else:     	vHmin = []; vHmax = []
+  if vHFull:	vHavg = int(sum(vHFull)/float(len(vHFull)))
+  else:     	vHavg = []
   log(3, "vDict['vW/vH']→unique values→integers")
   log(3, '\tvW:'+str(vDict['vW']) +'\t→ '+str(unique(vDict['vW']))+'\t→ '+str(vW))
   log(3, '\tvH:'+str(vDict['vH']) +'\t→ '+str(unique(vDict['vH']))+'\t→ '+str(vH))
-  log(3, 'vWxH text: '+str(vWxH)+', lenght: '+str(len(vWxH))+', vWxH[0]: '+str(vWxH[0]))
+  log(3, 'vWxH text: '+str(vWxH)+', lenght: '+str(len(vWxH))+', vWxH[0]: '+str((vWxH[0] if vWxH else '')))
   log(3, 'vHmin: '+str(vHmin)+', vHmax: '+str(vHmax))
-  if   len(vWxH)==1: FileName['vDim'] = vWxH[0]
+  if   len(vWxH)==0: FileName['vDim'] = ''
+  elif len(vWxH)==1: FileName['vDim'] = vWxH[0]
   elif len(vWxH)> 1:
     if (int(vHmax)/int(vHmin)>vDimLimit):
       if   len(vHFull)==2: FileName['vDim'] = str(vHmin)+jGen+str(vHmax)+'p'
@@ -224,7 +229,7 @@ def getNFOname(vFolder):
   vBD     	= jGen.join(str(i) for i in vBD)
   vrcType 	= jGen.join(str(i) for i in vrcType)
   vrcValue	= jGen.join(str(i).replace('.0','') for i in vrcValue)
-  FileName['vBD'] = vBD+'b'
+  FileName['vBD'] = vBD + ('b' if vBD > '' else '')
   FileName['Out'] += (' ' if FileName['vBD'] > '' else '') + FileName['vBD']
   vRC = vrcType+vrcValue
   FileName['vRC'] = vRC
@@ -243,7 +248,7 @@ def getNFOname(vFolder):
   aF	= jGen.join(map(str,aFunique))
   log(3,'getNFOname: Unique aF\t: ' + str(aF))
   FileName['aF'] = str(aF)
-  FileName['Out'] += (', ' if FileName['aF'] > '' else '') + FileName['aF']
+  FileName['Out'] += (', ' if (FileName['aF'] > '' and FileName['Out'] > '') else '') + FileName['aF']
   log(3,'FileName[aF]: ' + FileName['aF'])
 
   aCh	= list(map(int,(unique(aCh)))) #converted to int for sorting

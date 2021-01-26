@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file
 
 [unreleased]: https://github.com/eugenesvk/ListMediaInfo/compare/v2.0@21-1...HEAD
 ## [Unreleased]
+  - __Fixed__
+    + :beetle: Error in calculating NFO file name when video stream is missing
 
 [v2.0@21-1]: https://github.com/eugenesvk/ListMediaInfo/releases/tag/v2.0@21-1
 ## [v2.0@21-1]
