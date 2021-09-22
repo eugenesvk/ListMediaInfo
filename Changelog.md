@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file
 ## [Unreleased]
   - __Fixed__
     + :beetle: Error in calculating NFO file name when video stream is missing
+    + :beetle: Missing `colon` padding option from the default configuration file
 
 [v2.0@21-1]: https://github.com/eugenesvk/ListMediaInfo/releases/tag/v2.0@21-1
 ## [v2.0@21-1]

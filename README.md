@@ -63,6 +63,7 @@ padFmt      :
     AAC     : ' AAC'        # = 'EAC3'
     AC3     : '   AC3'        # = 'EAC3'
     m       : '     '          # = 'm'
+    colon   : '  '           # = ':'
 ```
 
 # Requirements
