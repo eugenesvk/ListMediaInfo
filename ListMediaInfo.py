@@ -71,7 +71,7 @@ def parseConfig(): # load config values from cfgFileName@cfgFolder
   for f in cfgFiles:
     if not Path(f).is_file(): continue # skip non-file items
     try:
-      cfgParse = load(Path(f).read_text(), cfgSchema)
+      cfgParse = load(Path(f).read_text(encoding='utf-8'), cfgSchema)
       cfg = cfgParse.data
       for Font in cfg['padFmt']: # Revalidate Font offset options
         cfgParse['padFmt'][Font].revalidate(padFmtSchema)
