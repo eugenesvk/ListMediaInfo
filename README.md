@@ -74,13 +74,11 @@ padFmt      :
 
 3. __Python 3 Modules__:
 ```
-pip install natsort fastnumbers PyICU
-pip install pymediainfo             	# wrapper to access MediaInfo library
-pip install -e "/path/to/hfilesize/"	# get from github.com/eugenesvk/hfilesize (it has an extra 'css' style without space and the useless 'b' indicator)
-OR                                  	# when/if [PR](github.com/simonzack/hfilesize/pull/4) is merged
+pip install natsort fastnumbers AppDirs strictyaml PyICU
+pip install pymediainfo                                 	# wrapper to access MediaInfo library
+pip install 'git+https://github.com/eugenesvk/hfilesize'	# has an extra 'css' style without space and the useless 'b' indicator
+OR                                                      	# when/if [PR](github.com/simonzack/hfilesize/pull/4) is merged
 pip install hfilesize
-pip install AppDirs
-pip install strictyaml
 ```
 
 # Command Line flags
