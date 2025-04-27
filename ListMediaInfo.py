@@ -40,7 +40,7 @@ def parseConfig(): # load config values from cfgFileName@cfgFolder
   padFmtSchema = Map(
     {'AVC':Str() , 'AAC':Str() , 'AC3':Str() , 'm':Str() , 'colon':Str()})
   padFmtDef = odict({'Cambria':
-    {'AVC':'      AVC', 'AAC':' AAC', 'AC3':'   AC3', 'colon':'  '}})
+    {'AVC':'      AVC', 'AAC':' AAC', 'AC3':'   AC3', 'm':' ', 'colon':'  '}})
   cfgSchema = Map({\
   Optional('logMin'     	, default='6')         	: Int(),
   Optional('H1'         	, default='Name')      	: Str(),
